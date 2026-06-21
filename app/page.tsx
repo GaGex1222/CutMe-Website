@@ -7,11 +7,11 @@ import { Scissors, ShieldCheck, Zap, Clock, ArrowLeft, CheckCircle2, Menu, X, Ch
 /* ─── animation variants ─── */
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
 };
 const fadeLeft = {
   hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
 };
 const stagger = {
   hidden: { opacity: 0 },
@@ -440,7 +440,7 @@ export default function CutmeLandingPage() {
               <motion.div
                 key={step.n}
                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-                variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] } } }}
+                variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } } }}
                 whileHover={{ y: -6, transition: { duration: 0.25 } }}
                 className="relative flex flex-col items-center md:items-start text-center md:text-right p-6 rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm hover:shadow-md transition-shadow"
               >
