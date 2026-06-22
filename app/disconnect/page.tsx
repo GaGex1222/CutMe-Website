@@ -34,6 +34,44 @@ const colorMap: Record<string, { bg: string; text: string; border: string; badge
 
 const PREFIXES = ['050','051','052','053','054','055','056','057','058','072','073','074','076','077','078','02','03','04','08','09'];
 
+const COMPANY_DOMAINS: Record<string, string> = {
+  'סלקום':            'cellcom.co.il',
+  'פלאפון':           'pelephone.co.il',
+  'פרטנר':            'partner.co.il',
+  "נטוויז'ן":         'netvision.net.il',
+  'בזק':              'bezeq.co.il',
+  'בזק בינלאומי':     'bezeqint.net',
+  'רמי לוי תקשורת':  'mobile.rami-levy.co.il',
+  'הוט מובייל':       'hot.net.il',
+  'הוט':              'hot.net.il',
+  'יס':               'yes.co.il',
+  'אקספון':           'xphone.co.il',
+  'אנלימיטד':         'unlimited.net.il',
+  'סלקום TV':         'cellcom.co.il',
+  'פרטנר TV':         'partner.co.il',
+  'סטינג TV':         'sting.co.il',
+  'Free TV':          'freetv.tv',
+  'גולן טלקום':       'golantelecom.co.il',
+  '019':              '019mobile.co.il',
+  'הולמס פלייס':      'holmesplace.co.il',
+  'גו אקטיב':         'goactive.co.il',
+  'גרייט שייפ':       'great-shape.co.il',
+  'ספורטר':           'www.sporter.co.il',
+  'אייקון פיטנס':     'iconfitness.co.il',
+  'פרופיט':           'profitgym.co.il',
+  'ספייס':            'spaceclub.co.il',
+  'Freefit / Move':   'freefit.co.il',
+  'תמי 4':            'tami4.co.il',
+  'מעיינות':          'mayanot.co.il',
+  'ידיעות אחרונות':   'ynet.co.il',
+  'מעריב':            'maariv.co.il',
+  'עיתון הארץ':       'haaretz.co.il',
+  'גלובס':            'globes.co.il',
+  'לאישה':            'laisha.co.il',
+  'מפעל הפיס':        'pais.co.il',
+  "ג'רוזלם פוסט":    'jpost.com',
+};
+
 /* ─── Validation helpers ─── */
 
 // Israeli ID — 9 digits + Luhn check
@@ -761,9 +799,14 @@ export default function DisconnectPage() {
 }
 
 function CompanyBtn({ name, selected, onClick }: { name: string; selected: boolean; onClick: () => void }) {
+  const domain = COMPANY_DOMAINS[name];
+  const pk = process.env.NEXT_PUBLIC_LOGO_DEV_PK;
+  const logoUrl = domain && pk ? `https://img.logo.dev/${domain}?token=${pk}&size=40&format=png` : null;
+  const [logoError, setLogoError] = useState(false);
+
   return (
     <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={onClick}
-      className={`relative flex items-center justify-center rounded-xl border-2 px-3 py-3 text-sm font-semibold text-center min-h-[52px] transition-all duration-200
+      className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-2 py-3 text-xs font-semibold text-center min-h-[72px] transition-all duration-200
         ${selected ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md shadow-blue-500/15' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-sm'}`}>
       {selected && (
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
@@ -771,7 +814,15 @@ function CompanyBtn({ name, selected, onClick }: { name: string; selected: boole
           <Check className="h-2.5 w-2.5" strokeWidth={3} />
         </motion.div>
       )}
-      {name}
+      {logoUrl && !logoError && (
+        <img
+          src={logoUrl}
+          alt={name}
+          className="h-8 w-8 object-contain"
+          onError={() => setLogoError(true)}
+        />
+      )}
+      <span>{name}</span>
     </motion.button>
   );
 }

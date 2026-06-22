@@ -51,38 +51,80 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
 
 /* ─── mobile menu ─── */
 function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const links = [
+    { label: 'איך זה עובד?', href: '#how-it-works' },
+    { label: 'למה אנחנו?', href: '#benefits' },
+    { label: 'החוק לטובתך', href: '#law' },
+  ];
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute top-full right-0 left-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xl px-6 py-4 flex flex-col gap-1"
-        >
-          {[
-            { label: 'איך זה עובד?', href: '#how-it-works' },
-            { label: 'למה אנחנו?', href: '#benefits' },
-            { label: 'החוק לטובתך', href: '#law' },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className="rounded-xl px-4 py-3 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
-          <a
-            href="/disconnect"
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="mt-2 rounded-xl bg-blue-600 px-4 py-3 text-center text-base font-bold text-white shadow-lg shadow-blue-600/20"
+            className="fixed inset-0 bg-slate-900/50 z-[998] md:hidden backdrop-blur-sm"
+          />
+          {/* Drawer — slides in from right (RTL) */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed top-0 right-0 bottom-0 w-full z-[999] bg-slate-50 flex flex-col md:hidden"
+            dir="rtl"
           >
-            להתנתק עכשיו
-          </a>
-        </motion.div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-6 bg-white border-b border-slate-100">
+              <button onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-slate-200 text-slate-500">
+                <X className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl font-black tracking-tight text-slate-900">CUT<span className="text-blue-600">ME</span></span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
+                  <Scissors className="h-5 w-5 -rotate-45" />
+                </div>
+              </div>
+            </div>
+
+            {/* Links */}
+            <div className="flex-1 flex flex-col justify-start px-6 pt-8 gap-3">
+              {links.map((item, i) => (
+                <motion.a
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.08 }}
+                  className="flex items-center justify-between rounded-2xl bg-white border border-slate-100 px-6 py-5 text-2xl font-bold text-slate-800 shadow-sm active:bg-blue-50 active:text-blue-600 transition-all"
+                >
+                  {item.label}
+                  <ArrowLeft className="h-6 w-6 text-slate-300 shrink-0" />
+                </motion.a>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="px-6 pb-12 pt-6 space-y-3">
+              <motion.a
+                href="/disconnect"
+                onClick={onClose}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center justify-center gap-3 w-full rounded-2xl bg-blue-600 py-5 text-xl font-extrabold text-white shadow-xl shadow-blue-600/25"
+              >
+                <Scissors className="h-5 w-5" />
+                בצע ניתוק עכשיו
+              </motion.a>
+              <p className="text-center text-sm text-slate-400 font-medium">תשלום על בסיס הצלחה בלבד</p>
+            </div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
@@ -166,11 +208,12 @@ export default function CutmeLandingPage() {
             </button>
           </div>
         </div>
-        <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       </motion.header>
 
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+
       {/* ── HERO ── */}
-      <section ref={heroRef} className="relative overflow-hidden py-16 sm:py-24 lg:py-32 bg-gradient-to-b from-blue-50/60 via-white to-transparent min-h-[90vh] flex items-center">
+      <section ref={heroRef} className="relative overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-transparent flex items-center">
         {/* Animated background blobs */}
         <motion.div style={{ y: springY }} className="absolute inset-0 pointer-events-none -z-10">
           <motion.div
@@ -200,14 +243,14 @@ export default function CutmeLandingPage() {
         </motion.div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-16 items-center">
 
             {/* Text */}
             <motion.div
               initial="hidden"
               animate="visible"
               variants={stagger}
-              className="lg:col-span-7 flex flex-col items-center lg:items-start space-y-5 sm:space-y-6 text-center lg:text-right"
+              className="lg:col-span-7 flex flex-col items-center lg:items-start space-y-5 sm:space-y-6 text-center lg:text-right min-h-[100svh] lg:min-h-0 justify-center py-16 lg:py-32"
             >
               <motion.div
                 variants={fadeUp}
@@ -269,6 +312,32 @@ export default function CutmeLandingPage() {
                   </div>
                 ))}
               </motion.div>
+
+              {/* Support cards */}
+              <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full pt-1">
+                <a href="/disconnect"
+                  className="group flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-4 py-3.5 text-right transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-sm">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
+                    <ShieldCheck className="h-4.5 w-4.5 h-[18px] w-[18px] text-emerald-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-emerald-800">לא נותקת — לא שילמת</p>
+                    <p className="text-[11px] text-emerald-600 leading-snug">המשיכו לחייב אותך? נטפל בזה</p>
+                  </div>
+                  <ArrowLeft className="h-3.5 w-3.5 text-emerald-400 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
+                </a>
+                <a href="mailto:support@cutme.co.il"
+                  className="group flex items-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/60 px-4 py-3.5 text-right transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                    <Bell className="h-[18px] w-[18px] text-blue-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-blue-800">לא מצאת את החברה?</p>
+                    <p className="text-[11px] text-blue-600 leading-snug">כתוב לנו — נבצע את הניתוק עבורך</p>
+                  </div>
+                  <ArrowLeft className="h-3.5 w-3.5 text-blue-400 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
+                </a>
+              </motion.div>
             </motion.div>
 
             {/* Card visual */}
@@ -276,7 +345,7 @@ export default function CutmeLandingPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-5 flex justify-center w-full"
+              className="lg:col-span-5 flex justify-center w-full pb-16 lg:py-32"
             >
               <div className="relative w-full max-w-[340px] sm:max-w-sm">
                 {/* Glow behind card */}
@@ -308,7 +377,7 @@ export default function CutmeLandingPage() {
                       {/* HOT row */}
                       <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3 border border-slate-100">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 shrink-0 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">הוט</div>
+                          <img src={`https://img.logo.dev/hot.net.il?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PK}&size=40&format=png`} alt="הוט" className="h-11 w-11 shrink-0 rounded-lg object-contain bg-white border border-slate-100 p-0.5" onError={e => { (e.target as HTMLImageElement).style.display='none' }} />
                           <div className="space-y-1">
                             <div className="h-2.5 w-16 rounded-full bg-slate-300" />
                             <div className="h-2 w-10 rounded-full bg-slate-200" />
@@ -324,7 +393,7 @@ export default function CutmeLandingPage() {
                         className="flex items-center justify-between rounded-xl bg-blue-50/60 p-3 border border-blue-100/70"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 shrink-0 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">סלקום</div>
+                          <img src={`https://img.logo.dev/cellcom.co.il?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PK}&size=40&format=png`} alt="סלקום" className="h-11 w-11 shrink-0 rounded-lg object-contain bg-white border border-slate-100 p-0.5" onError={e => { (e.target as HTMLImageElement).style.display='none' }} />
                           <div className="space-y-1">
                             <div className="h-2.5 w-14 rounded-full bg-slate-300" />
                             <div className="h-2 w-9 rounded-full bg-slate-200" />
@@ -342,7 +411,7 @@ export default function CutmeLandingPage() {
                       {/* YES row */}
                       <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3 border border-slate-100">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 shrink-0 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">YES</div>
+                          <img src={`https://img.logo.dev/yes.co.il?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PK}&size=40&format=png`} alt="YES" className="h-11 w-11 shrink-0 rounded-lg object-contain bg-white border border-slate-100 p-0.5" onError={e => { (e.target as HTMLImageElement).style.display='none' }} />
                           <div className="space-y-1">
                             <div className="h-2.5 w-12 rounded-full bg-slate-300" />
                             <div className="h-2 w-8 rounded-full bg-slate-200" />
@@ -428,29 +497,35 @@ export default function CutmeLandingPage() {
             </motion.p>
           </motion.div>
 
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8">
             {/* connecting line — desktop only */}
             <div className="hidden md:block absolute top-12 right-[calc(16.67%+24px)] left-[calc(16.67%+24px)] h-px bg-gradient-to-l from-blue-300/60 via-cyan-300/60 to-blue-300/60" />
 
             {[
-              { n: '1', icon: <FileText className="h-5 w-5" />, title: 'מילוי טופס מהיר', desc: 'בוחרים חברה, מזינים פרטי מנוי בסיסיים — לוקח פחות מ-2 דקות.', color: 'bg-blue-600', shadow: 'shadow-blue-600/20' },
-              { n: '2', icon: <Scissors className="h-5 w-5 -rotate-45" />, title: 'הפקת מסמך ושליחה', desc: 'המערכת מייצרת PDF חתום ושולחת אותו למחלקת הניתוקים באופן אוטומטי.', color: 'bg-cyan-500', shadow: 'shadow-cyan-500/20' },
-              { n: '3', icon: <Bell className="h-5 w-5" />, title: 'אישור סופי למייל', desc: 'מעקב אוטומטי מול החברה. ברגע שאושר — מייל מסודר נשלח אליך.', color: 'bg-indigo-600', shadow: 'shadow-indigo-600/20' },
-            ].map((step, i) => (
-              <motion.div
-                key={step.n}
-                initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-                variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } } }}
-                whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                className="relative flex flex-col items-center md:items-start text-center md:text-right p-6 rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${step.color} text-white shadow-md ${step.shadow} mb-5 text-lg font-bold`}>
-                  {step.icon}
-                </div>
-                <span className="absolute top-4 left-4 text-4xl font-black text-slate-100 select-none">{step.n}</span>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{step.desc}</p>
-              </motion.div>
+              { n: '1', icon: <FileText className="h-5 w-5" />, title: 'מילוי טופס מהיר', desc: 'בוחרים חברה, מזינים פרטי מנוי בסיסיים — לוקח פחות מ-2 דקות.', color: 'bg-blue-600', shadow: 'shadow-blue-600/20', numColor: 'text-blue-200' },
+              { n: '2', icon: <Scissors className="h-5 w-5 -rotate-45" />, title: 'הפקת מסמך ושליחה', desc: 'המערכת מייצרת PDF חתום ושולחת אותו למחלקת הניתוקים באופן אוטומטי.', color: 'bg-cyan-500', shadow: 'shadow-cyan-500/20', numColor: 'text-cyan-200' },
+              { n: '3', icon: <Bell className="h-5 w-5" />, title: 'אישור סופי למייל', desc: 'מעקב אוטומטי מול החברה. ברגע שאושר — מייל מסודר נשלח אליך.', color: 'bg-indigo-600', shadow: 'shadow-indigo-600/20', numColor: 'text-indigo-200' },
+            ].map((step, i, arr) => (
+              <React.Fragment key={step.n}>
+                <motion.div
+                  initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
+                  variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } } }}
+                  whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                  className="relative flex flex-col items-center md:items-start text-center md:text-right p-6 rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${step.color} text-white shadow-md ${step.shadow} mb-5 text-lg font-bold`}>
+                    {step.icon}
+                  </div>
+                  <span className={`absolute top-3 left-4 text-6xl font-black select-none leading-none ${step.numColor}`}>{step.n}</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{step.desc}</p>
+                </motion.div>
+                {i < arr.length - 1 && (
+                  <div className="md:hidden flex justify-center py-2">
+                    <div className="w-px h-10 border-r-2 border-dashed border-slate-300" />
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </div>
@@ -481,7 +556,7 @@ export default function CutmeLandingPage() {
               </motion.h2>
               <motion.div variants={stagger} className="space-y-3 sm:space-y-4">
                 {[
-                  { title: 'חוקי 100%', desc: 'פועלים על פי חוק הגנת הצרכן הישראלי — החברות מחויבות לעמוד בבקשתך.' },
+                  { title: 'תשלום על בסיס הצלחה בלבד', desc: 'לא נותקת — לא שילמת. אנחנו גובים רק אם הניתוק בוצע בפועל.' },
                   { title: 'מהיר ופשוט', desc: 'הטופס שלנו לוקח 2 דקות. לא צריך להסביר לאיש שירות מתיש.' },
                   { title: 'מעקב אוטומטי', desc: 'המערכת עוקבת אחרי הבקשה עבורך ומדווחת ברגע שהניתוק אושר.' },
                   { title: 'ראיה משפטית', desc: 'המסמך שאנחנו מפיקים תקף כראיה משפטית מלאה בכל מחלוקת עתידית.' },
@@ -544,11 +619,6 @@ export default function CutmeLandingPage() {
             {/* decorations */}
             <div className="absolute -bottom-10 -left-10 h-52 w-52 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
             <div className="absolute -top-10 -right-10 h-44 w-44 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-              className="absolute top-6 left-6 h-20 w-20 rounded-full border border-cyan-500/20 pointer-events-none"
-            />
 
             <div className="relative max-w-3xl space-y-4 sm:space-y-6 text-right">
               <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 text-xs sm:text-sm font-semibold text-cyan-400">
