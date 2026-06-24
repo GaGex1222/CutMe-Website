@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from 'framer-motion';
-import { Scissors, ShieldCheck, Zap, Clock, ArrowLeft, CheckCircle2, Menu, X, ChevronDown, Star, Sparkles, FileText, Bell } from 'lucide-react';
+import { Scissors, ShieldCheck, Zap, Clock, ArrowLeft, CheckCircle2, Menu, X, ChevronDown, Star, Sparkles, FileText, Bell, TrendingUp, Gift, PhoneCall } from 'lucide-react';
 
 /* ─── animation variants ─── */
 const fadeUp = {
@@ -121,7 +121,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <Scissors className="h-5 w-5" />
                 בצע ניתוק עכשיו
               </motion.a>
-              <p className="text-center text-sm text-slate-400 font-medium">תשלום על בסיס הצלחה בלבד</p>
+              <p className="text-center text-sm text-slate-400 font-medium">חינם לגמרי — ללא עלות</p>
             </div>
           </motion.div>
         </>
@@ -141,6 +141,20 @@ export default function CutmeLandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased overflow-x-hidden" dir="rtl">
+
+      {/* ── ANNOUNCEMENT BANNER ── */}
+      <div className="bg-gradient-to-l from-orange-500 to-red-500 text-white text-center py-2.5 px-4 text-sm font-bold relative">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-center gap-2 flex-wrap"
+        >
+          <span>📺</span>
+          <span>שוב האינטרנט והטלוויזיה קפצו ב-49₪ החודש כי נגמר המבצע?</span>
+          <a href="/disconnect" className="underline underline-offset-2 font-black hover:no-underline whitespace-nowrap">קבל הצעה טובה יותר — בחינם ←</a>
+        </motion.div>
+      </div>
 
       {/* ── NAVBAR ── */}
       <motion.header
@@ -254,20 +268,20 @@ export default function CutmeLandingPage() {
             >
               <motion.div
                 variants={fadeUp}
-                className="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-100 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-blue-700"
+                className="inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-green-700"
               >
-                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500 shrink-0" />
-                <span>ניתוק רשמי תוך 3 ימי עסקים לפי חוק</span>
+                <Gift className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 shrink-0" />
+                <span>התנתקו עכשיו בחינם לגמרי!</span>
               </motion.div>
 
               <motion.h1
                 variants={fadeUp}
                 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1]"
               >
-                נמאס לך לנסות להתנתק{' '}
+                נמאס מחברת התקשורת?{' '}
                 <br className="hidden sm:block" />
                 <span className="bg-gradient-to-l from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                  מחברות בטלפון?
+                  נעביר אותך לעסקה טובה יותר
                 </span>
               </motion.h1>
 
@@ -275,12 +289,41 @@ export default function CutmeLandingPage() {
                 variants={fadeUp}
                 className="max-w-xl text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed"
               >
-                בלי להמתין שעות בטלפון, בלי נציגי שימור מתישים ובלי ויכוחים. ממלאים טופס קצר ב-2 דקות, ואנחנו מנתקים אותך מסלקום, יס, הוט — או כל חברה אחרת.
+                ממלאים טופס קצר ב-2 דקות — אנחנו מטפלים בניתוק <strong className="text-slate-800">בחינם</strong> ומביאים לך הצעת מחיר משתלמת יותר מחברה אחרת. בלי שיחות, בלי המתנה, בלי עלות.
               </motion.p>
+
+              {/* 3 options */}
+              <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full pt-1">
+                <a href="/disconnect"
+                  className="group flex flex-col gap-2 rounded-2xl border-2 border-blue-500 bg-blue-50 px-4 py-4 text-right transition-all hover:bg-blue-100 hover:shadow-md relative overflow-hidden">
+                  <span className="absolute top-2 left-2 text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full">מומלץ</span>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
+                    <TrendingUp className="h-[18px] w-[18px]" />
+                  </div>
+                  <p className="text-sm font-black text-blue-900">ניתוק + הצעת מחיר</p>
+                  <p className="text-[11px] text-blue-700 leading-snug">מתנתקים ועוברים לעסקה משתלמת יותר</p>
+                </a>
+                <a href="/disconnect"
+                  className="group flex flex-col gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-4 py-4 text-right transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-sm">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
+                    <PhoneCall className="h-[18px] w-[18px] text-emerald-600" />
+                  </div>
+                  <p className="text-xs font-bold text-emerald-800">הצעת מחיר בלבד</p>
+                  <p className="text-[11px] text-emerald-600 leading-snug">רק רוצה לבדוק כמה אפשר לחסוך</p>
+                </a>
+                <a href="/disconnect"
+                  className="group flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-right transition-all hover:border-slate-300 hover:shadow-sm">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                    <Scissors className="h-[18px] w-[18px] text-slate-600 -rotate-45" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-800">ניתוק בלבד</p>
+                  <p className="text-[11px] text-slate-500 leading-snug">רק רוצה להתנתק, ללא מעבר</p>
+                </a>
+              </motion.div>
 
               <motion.div
                 variants={fadeUp}
-                className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-2"
+                className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
               >
                 <motion.a
                   whileHover={{ scale: 1.03, y: -2 }}
@@ -288,7 +331,8 @@ export default function CutmeLandingPage() {
                   href="/disconnect"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white shadow-xl shadow-blue-600/25 hover:bg-blue-700 transition-colors"
                 >
-                  <span>מתחילים כאן: בצע ניתוק עכשיו</span>
+                  <Gift className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+                  <span>מתחילים — חינם לגמרי</span>
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
                 </motion.a>
                 <motion.a
@@ -305,38 +349,12 @@ export default function CutmeLandingPage() {
                 variants={fadeUp}
                 className="flex flex-wrap justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-slate-500 pt-2"
               >
-                {['אבטחת מידע מלאה', 'אישור חתום למייל', 'חוקי 100%'].map((t) => (
+                {['חינם לגמרי', 'אישור חתום למייל', 'חוקי 100%'].map((t) => (
                   <div key={t} className="flex items-center gap-1.5">
                     <ShieldCheck className="h-4 w-4 text-cyan-500 shrink-0" />
                     <span>{t}</span>
                   </div>
                 ))}
-              </motion.div>
-
-              {/* Support cards */}
-              <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full pt-1">
-                <a href="/disconnect"
-                  className="group flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-4 py-3.5 text-right transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-sm">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
-                    <ShieldCheck className="h-4.5 w-4.5 h-[18px] w-[18px] text-emerald-600" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-emerald-800">לא נותקת — לא שילמת</p>
-                    <p className="text-[11px] text-emerald-600 leading-snug">המשיכו לחייב אותך? נטפל בזה</p>
-                  </div>
-                  <ArrowLeft className="h-3.5 w-3.5 text-emerald-400 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
-                </a>
-                <a href="mailto:support@cutme.co.il"
-                  className="group flex items-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/60 px-4 py-3.5 text-right transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                    <Bell className="h-[18px] w-[18px] text-blue-600" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-blue-800">לא מצאת את החברה?</p>
-                    <p className="text-[11px] text-blue-600 leading-snug">כתוב לנו — נבצע את הניתוק עבורך</p>
-                  </div>
-                  <ArrowLeft className="h-3.5 w-3.5 text-blue-400 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
-                </a>
               </motion.div>
             </motion.div>
 
@@ -420,9 +438,9 @@ export default function CutmeLandingPage() {
                         <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-500 border border-slate-200">ממתין</span>
                       </div>
                     </div>
-                    <div className="rounded-xl bg-gradient-to-l from-blue-600 to-blue-700 p-4 text-center text-white">
-                      <p className="text-xs font-medium opacity-75">דמי שירות סמליים</p>
-                      <p className="text-2xl font-black mt-0.5">₪29 בלבד</p>
+                    <div className="rounded-xl bg-gradient-to-l from-green-600 to-emerald-500 p-4 text-center text-white">
+                      <p className="text-xs font-medium opacity-90">השירות הינו</p>
+                      <p className="text-2xl font-black mt-0.5">חינם לגמרי! 🎉</p>
                     </div>
                   </div>
                 </div>
@@ -556,9 +574,9 @@ export default function CutmeLandingPage() {
               </motion.h2>
               <motion.div variants={stagger} className="space-y-3 sm:space-y-4">
                 {[
-                  { title: 'תשלום על בסיס הצלחה בלבד', desc: 'לא נותקת — לא שילמת. אנחנו גובים רק אם הניתוק בוצע בפועל.' },
+                  { title: 'חינם לחלוטין', desc: 'אין עלות ללקוח. אנחנו מרוויחים מהחברות השותפות שמקבלות לקוחות חדשים.' },
+                  { title: 'הצעת מחיר משתלמת יותר', desc: 'מביאים לך הצעה טובה מחברה מתחרה — חסכון של מאות שקלים בשנה.' },
                   { title: 'מהיר ופשוט', desc: 'הטופס שלנו לוקח 2 דקות. לא צריך להסביר לאיש שירות מתיש.' },
-                  { title: 'מעקב אוטומטי', desc: 'המערכת עוקבת אחרי הבקשה עבורך ומדווחת ברגע שהניתוק אושר.' },
                   { title: 'ראיה משפטית', desc: 'המסמך שאנחנו מפיקים תקף כראיה משפטית מלאה בכל מחלוקת עתידית.' },
                 ].map((b) => (
                   <motion.div
@@ -656,14 +674,14 @@ export default function CutmeLandingPage() {
         </div>
         <div className="mx-auto max-w-2xl px-4 sm:px-6 text-center space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 text-xs sm:text-sm font-semibold text-blue-400">
-              <Scissors className="h-3.5 w-3.5" /> 3 שלבים פשוטים · ₪29 בלבד
+            <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 border border-green-500/20 px-4 py-1.5 text-xs sm:text-sm font-semibold text-green-400">
+              <Gift className="h-3.5 w-3.5" /> חינם לגמרי · 3 שלבים פשוטים
             </div>
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-              מוכן לחתוך<br className="sm:hidden" /> את הקשר?
+              מוכן לעסקה<br className="sm:hidden" /> טובה יותר?
             </h2>
             <p className="text-slate-400 text-sm sm:text-lg max-w-md mx-auto leading-relaxed">
-              בחר חברה, מלא פרטים — המערכת שולחת בשמך בקשה רשמית וחוקית תוך דקות.
+              בחר חברה, מלא פרטים — אנחנו מנתקים אותך <strong className="text-white">בחינם</strong> ומביאים לך הצעה משתלמת יותר.
             </p>
           </motion.div>
 
@@ -673,8 +691,8 @@ export default function CutmeLandingPage() {
               href="/disconnect"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-4 text-base sm:text-lg font-black text-white shadow-2xl shadow-blue-600/30 hover:bg-blue-500 transition-colors"
             >
-              <Scissors className="h-5 w-5 -rotate-45" />
-              בצע ניתוק עכשיו
+              <Gift className="h-5 w-5" />
+              קבל הצעה — חינם עכשיו
               <ArrowLeft className="h-5 w-5" />
             </motion.a>
           </motion.div>
@@ -683,7 +701,7 @@ export default function CutmeLandingPage() {
             {[
               { icon: ShieldCheck, text: 'מאובטח ומוצפן' },
               { icon: CheckCircle2, text: 'ניתוק תוך 3 ימים לפי חוק' },
-              { icon: Zap, text: 'תשלום חד-פעמי ₪29' },
+              { icon: Gift, text: 'חינם לגמרי — אפס עלות' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-1.5">
                 <Icon className="h-3.5 w-3.5 text-blue-500" /> {text}
@@ -704,7 +722,7 @@ export default function CutmeLandingPage() {
             <span className="text-xs text-slate-500">© {new Date().getFullYear()}</span>
           </div>
           <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-            האתר הינו שירות פרטי ואינו מטעם חברות התקשורת בישראל. השירות כרוך בדמי טיפול וסליקה סמליים עבור הפקת הבקשה ושיגורה האוטומטי.
+            האתר הינו שירות פרטי ואינו מטעם חברות התקשורת בישראל. השירות חינמי לחלוטין עבור הלקוח — אנחנו פועלים בשיתוף עם חברות תקשורת שותפות.
           </p>
         </div>
       </footer>

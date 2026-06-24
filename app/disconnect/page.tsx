@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scissors, Check, ArrowLeft, ArrowRight,
@@ -15,14 +15,6 @@ const COMPANIES = [
   {
     id: 'telecom', category: 'ספקי תקשורת', Icon: Wifi, color: 'blue',
     items: ['סלקום','פלאפון','פרטנר','נטוויז\'ן','בזק','בזק בינלאומי','רמי לוי תקשורת','הוט מובייל','הוט','יס','אקספון','אנלימיטד','סלקום TV','פרטנר TV','סטינג TV','Free TV','גולן טלקום','019'],
-  },
-  {
-    id: 'gym', category: 'מועדוני כושר', Icon: Dumbbell, color: 'violet',
-    items: ['הולמס פלייס','גו אקטיב','גרייט שייפ','ספורטר','אייקון פיטנס','פרופיט','ספייס','Freefit / Move'],
-  },
-  {
-    id: 'general', category: 'כללי', Icon: Newspaper, color: 'amber',
-    items: ['תמי 4','מעיינות','ידיעות אחרונות','מעריב','עיתון הארץ','גלובס','לאישה','מפעל הפיס','ג\'רוזלם פוסט'],
   },
 ];
 
@@ -172,7 +164,7 @@ function StepBar({ step }: { step: number }) {
   const steps = [
     { label: 'בחירת חברה', Icon: Search },
     { label: 'מילוי פרטים', Icon: FileText },
-    { label: 'אישור ותשלום', Icon: CreditCard },
+    { label: 'אישור ושליחה', Icon: BadgeCheck },
   ];
   return (
     <div className="flex items-center justify-center mb-8 sm:mb-10">
@@ -349,6 +341,10 @@ export default function DisconnectPage() {
   const [done, setDone] = useState(false);
   const [openSection, setOpenSection] = useState<SectionId | null>('account');
   const [showErrors, setShowErrors] = useState<Partial<Record<SectionId, boolean>>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [sig, setSig] = useState<string | null>(null);
+  const [showSigError, setShowSigError] = useState(false);
 
   function go(n: number) { setDir(n > step ? 1 : -1); setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   function sf<K extends keyof FormData>(k: K, v: FormData[K]) { setForm(f => ({ ...f, [k]: v })); }
@@ -664,7 +660,7 @@ export default function DisconnectPage() {
                     </div>
                     <input type="checkbox" checked={form.agreed} onChange={e => sf('agreed', e.target.checked)} className="hidden" />
                     <span className="text-sm text-slate-600 leading-relaxed">
-                      קראתי והסכמתי ל<a href="#" className="text-blue-600 hover:underline font-bold">תנאי השימוש והתקנון</a> של אתר CutMe
+                      קראתי והסכמתי ל<a href="#" className="text-blue-600 hover:underline font-bold">תנאי השימוש והתקנון</a> של אתר CutMe, ומאשר/ת מתן <strong className="text-slate-700">ייפוי כוח</strong> ל-CutMe לפעול בשמי מול הספק לצורך ביצוע הניתוק.
                     </span>
                   </motion.label>
                 </div>
@@ -697,8 +693,8 @@ export default function DisconnectPage() {
                       <BadgeCheck className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-black text-lg">שלב 3 — אישור ותשלום</p>
-                      <p className="text-emerald-100 text-sm">בדוק את הפרטים ואשר את הבקשה</p>
+                      <p className="font-black text-lg">שלב 3 — אישור ושליחה</p>
+                      <p className="text-emerald-100 text-sm">בדוק את הפרטים ושלח — חינם לגמרי</p>
                     </div>
                   </div>
                 </div>
@@ -741,23 +737,58 @@ export default function DisconnectPage() {
                     </button>
                   </div>
 
-                  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-700 to-blue-500 p-5 sm:p-6 text-white shadow-lg shadow-blue-600/20">
+                  {/* Power of Attorney */}
+                  <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                    <div className="flex items-center gap-2.5 bg-slate-50 border-b border-slate-200 px-5 py-3.5">
+                      <ShieldCheck className="h-4 w-4 text-blue-500 shrink-0" />
+                      <p className="font-bold text-sm text-slate-800">ייפוי כוח</p>
+                      <span className="mr-auto text-[11px] text-slate-400 font-medium">חתימה נדרשת לפני השליחה</span>
+                    </div>
+                    <div className="p-4 sm:p-5 space-y-4">
+                      {/* POA document preview */}
+                      <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-slate-700 leading-relaxed space-y-3" dir="rtl">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs border-b border-slate-200 pb-3 mb-3">
+                          <p><span className="font-bold text-slate-500">שם מלא: </span>{form.firstName} {form.lastName}</p>
+                          <p><span className="font-bold text-slate-500">ת.ז.: </span>{form.idNumber}</p>
+                          <p><span className="font-bold text-slate-500">טלפון: </span>{form.phonePrefix}-{form.phone}</p>
+                          <p><span className="font-bold text-slate-500">דוא&quot;ל: </span>{form.email}</p>
+                        </div>
+                        <p className="text-xs leading-relaxed">
+                          ממנה ומייפה את כוחה של <strong>CutMe</strong> (להלן: &quot;השליח&quot;), ו/או מי מטעמם, להיות שלוחי ונציגי החוקיים לבצע בשמי ובמקומי את הפעולות הבאות:
+                        </p>
+                        <ol className="list-decimal space-y-2 text-xs text-slate-600 pr-4">
+                          <li><strong>משלוח הודעת ביטול:</strong> לשלוח הודעות ביטול לכל חברה, בית עסק או ספק שירותים (&quot;הספק&quot;), בהתאם לפרטים הספציפיים שאגיש במערכת.</li>
+                          <li><strong>בירור ואימות:</strong> לפנות אל הספקים לצורך בירור סטטוס ביטול העסקה, אימות קבלת הודעת הניתוק, ודרישת הפסקת חיובים, בהתאם להוראות חוק הגנת הצרכן, התשמ&quot;א-1981.</li>
+                          <li><strong>חתימה על מסמכים:</strong> לחתום בשמי על כל הודעה, טופס או מסמך הנדרשים על ידי הספקים לצורך השלמת תהליך הניתוק או הביטול.</li>
+                        </ol>
+                      </div>
+                      {/* Signature pad */}
+                      <SignaturePad onChange={setSig} />
+                      {showSigError && !sig && (
+                        <p className="text-[11px] text-red-500 font-medium text-right flex items-center gap-1 justify-end">
+                          <AlertCircle className="h-3 w-3" /> נדרשת חתימה דיגיטלית לאישור ייפוי הכוח
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-emerald-700 to-emerald-500 p-5 sm:p-6 text-white shadow-lg shadow-emerald-600/20">
                     <div className="absolute top-0 left-0 h-32 w-32 rounded-full bg-white/5 -translate-x-8 -translate-y-8" />
                     <div className="relative flex flex-col sm:flex-row items-center justify-between gap-5">
                       <div className="text-center sm:text-right">
-                        <p className="text-blue-200 text-sm font-medium">דמי שירות — הפקה ושיגור אוטומטי</p>
-                        <p className="text-4xl sm:text-5xl font-black mt-1">₪29</p>
-                        <p className="text-blue-200 text-xs mt-1">תשלום חד-פעמי · ללא חיובים נוספים</p>
+                        <p className="text-emerald-100 text-sm font-medium">השירות הינו</p>
+                        <p className="text-4xl sm:text-5xl font-black mt-1">חינם!</p>
+                        <p className="text-emerald-200 text-xs mt-1">אפס עלות · ללא חיובים</p>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-1 gap-2">
                         {[
                           { icon: Clock,       text: 'ניתוק תוך 3 ימי עסקים' },
                           { icon: Mail,        text: 'אישור PDF חתום למייל' },
-                          { icon: Star,        text: 'מעקב אוטומטי' },
+                          { icon: Star,        text: 'הצעת מחיר משתלמת יותר' },
                           { icon: ShieldCheck, text: 'ראיה משפטית מלאה' },
                         ].map(({ icon: Icon, text }) => (
-                          <div key={text} className="flex items-center gap-2 text-blue-100">
-                            <Icon className="h-4 w-4 text-cyan-300 shrink-0" />
+                          <div key={text} className="flex items-center gap-2 text-emerald-100">
+                            <Icon className="h-4 w-4 text-white/80 shrink-0" />
                             <span className="text-xs sm:text-sm">{text}</span>
                           </div>
                         ))}
@@ -766,7 +797,7 @@ export default function DisconnectPage() {
                   </div>
 
                   <div className="flex flex-wrap justify-center gap-4">
-                    {[{ icon: Lock, text: 'תשלום מאובטח SSL' }, { icon: ShieldCheck, text: 'חוקי 100%' }, { icon: BadgeCheck, text: 'אישור מיידי למייל' }].map(({ icon: Icon, text }) => (
+                    {[{ icon: Lock, text: 'מאובטח SSL' }, { icon: ShieldCheck, text: 'חוקי 100%' }, { icon: BadgeCheck, text: 'אישור מיידי למייל' }].map(({ icon: Icon, text }) => (
                       <div key={text} className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                         <Icon className="h-3.5 w-3.5 text-slate-400" /> {text}
                       </div>
@@ -774,15 +805,50 @@ export default function DisconnectPage() {
                   </div>
                 </div>
 
+                {submitError && (
+                  <div className="mx-4 sm:mx-6 mt-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 font-medium text-right">
+                    {submitError}
+                  </div>
+                )}
+
                 <div className="border-t border-slate-100 bg-slate-50/70 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center gap-3 justify-between">
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => go(2)}
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:border-slate-300">
                     <ArrowRight className="h-4 w-4" /> חזרה לתיקון פרטים
                   </motion.button>
-                  <motion.button whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => setDone(true)}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-emerald-500 px-7 py-3.5 text-base font-black text-white shadow-xl shadow-emerald-500/30 hover:bg-emerald-600 transition-colors">
-                    <CreditCard className="h-5 w-5" /> תשלום ושליחת בקשת ניתוק
+                  <motion.button
+                    whileHover={{ scale: submitting ? 1 : 1.03, y: submitting ? 0 : -1 }}
+                    whileTap={{ scale: submitting ? 1 : 0.97 }}
+                    disabled={submitting}
+                    onClick={async () => {
+                      if (!sig) { setShowSigError(true); return; }
+                      setSubmitting(true);
+                      setSubmitError(null);
+                      try {
+                        const res = await fetch('/api/create-form', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ company: selected, form, signature: sig }),
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          setDone(true);
+                        } else {
+                          setSubmitError('אירעה שגיאה. אנא נסה שוב.');
+                        }
+                      } catch {
+                        setSubmitError('אירעה שגיאה. אנא נסה שוב.');
+                      } finally {
+                        setSubmitting(false);
+                      }
+                    }}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl px-7 py-3.5 text-base font-black text-white shadow-xl transition-colors
+                      ${submitting ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-500 shadow-emerald-500/30 hover:bg-emerald-600'}`}>
+                    {submitting ? (
+                      <><svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg> מייצר מסמך...</>
+                    ) : (
+                      <><Scissors className="h-5 w-5 -rotate-45" /> ניתוק עכשיו — חינם</>
+                    )}
                   </motion.button>
                 </div>
               </div>
@@ -794,6 +860,89 @@ export default function DisconnectPage() {
           השירות פועל לפי חוק הגנת הצרכן. החברות מחויבות לנתק אותך תוך 3 ימי עסקים מרגע קבלת הבקשה הכתובה.
         </p>
       </main>
+    </div>
+  );
+}
+
+
+/* ─── SignaturePad ─── */
+function SignaturePad({ onChange }: { onChange: (dataUrl: string | null) => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const drawing = useRef(false);
+  const hasStrokes = useRef(false);
+  const [signed, setSigned] = useState(false);
+
+  const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
+    const rect = canvas.getBoundingClientRect();
+    const src = 'touches' in e ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }, []);
+
+  const start = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext('2d')!;
+    const pos = getPos(e.nativeEvent as MouseEvent | TouchEvent, canvas);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    drawing.current = true;
+  }, []);
+
+  const move = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    if (!drawing.current) return;
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext('2d')!;
+    const pos = getPos(e.nativeEvent as MouseEvent | TouchEvent, canvas);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    hasStrokes.current = true;
+    setSigned(true);
+  }, []);
+
+  const end = useCallback(() => {
+    if (!drawing.current) return;
+    drawing.current = false;
+    if (hasStrokes.current) onChange(canvasRef.current!.toDataURL('image/png'));
+  }, [onChange]);
+
+  const clear = () => {
+    const canvas = canvasRef.current!;
+    canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
+    hasStrokes.current = false;
+    setSigned(false);
+    onChange(null);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-slate-600">חתימה דיגיטלית <span className="text-red-400">*</span></span>
+        <button type="button" onClick={clear} className="text-[11px] text-slate-400 hover:text-red-500 transition-colors font-medium">נקה</button>
+      </div>
+      <div className="relative rounded-xl border-2 border-dashed border-slate-300 bg-white overflow-hidden hover:border-blue-300 transition-colors">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-28 touch-none cursor-crosshair"
+          onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
+          onTouchStart={start} onTouchMove={move} onTouchEnd={end}
+        />
+        {!signed && (
+          <p className="absolute inset-0 flex items-center justify-center text-slate-300 text-sm font-medium pointer-events-none select-none">חתום כאן</p>
+        )}
+      </div>
     </div>
   );
 }
