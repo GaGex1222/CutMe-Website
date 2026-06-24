@@ -439,8 +439,10 @@ export default function CutmeLandingPage() {
                       </div>
                     </div>
                     <div className="rounded-xl bg-gradient-to-l from-green-600 to-emerald-500 p-4 text-center text-white">
-                      <p className="text-xs font-medium opacity-90">השירות הינו</p>
-                      <p className="text-2xl font-black mt-0.5">חינם לגמרי! 🎉</p>
+                      <div className="flex items-center justify-center gap-2">
+                        <Gift className="h-5 w-5 shrink-0" />
+                        <p className="text-xl font-black">התנתקו עכשיו בחינם לגמרי!</p>
+                      </div>
                     </div>
                   </div>
                 </div>
