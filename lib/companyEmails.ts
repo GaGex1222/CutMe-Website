@@ -1,22 +1,23 @@
-// ⚠️  Fill in the real disconnect email for each company before going live.
-// These are the addresses CutMe will send the disconnection PDF to.
+// ⚠️  TEST MODE — all emails go to test address. Replace with real company emails before go-live.
+const TEST_EMAIL = 'gaexlagoj@gmail.com';
+
 export const COMPANY_EMAILS: Record<string, string> = {
-  'סלקום':           'ניתוקים@cellcom.co.il',
-  'פלאפון':          'service@pelephone.co.il',
-  'פרטנר':           'partner@partner.co.il',
-  "נטוויז'ן":        'support@netvision.net.il',
-  'בזק':             'service@bezeq.co.il',
-  'בזק בינלאומי':    'support@bezeqint.net',
-  'רמי לוי תקשורת': 'service@rami-levy.co.il',
-  'הוט מובייל':      'service@hot.net.il',
-  'הוט':             'service@hot.net.il',
-  'יס':              'service@yes.co.il',
-  'אקספון':          'service@xphone.co.il',
-  'אנלימיטד':        'service@unlimited.net.il',
-  'סלקום TV':        'ניתוקים@cellcom.co.il',
-  'פרטנר TV':        'partner@partner.co.il',
-  'סטינג TV':        'service@sting.co.il',
-  'Free TV':         'service@freetv.tv',
-  'גולן טלקום':      'service@golantelecom.co.il',
-  '019':             'service@019mobile.co.il',
+  'סלקום':           TEST_EMAIL,
+  'פלאפון':          TEST_EMAIL,
+  'פרטנר':           TEST_EMAIL,
+  "נטוויז'ן":        TEST_EMAIL,
+  'בזק':             TEST_EMAIL,
+  'בזק בינלאומי':    TEST_EMAIL,
+  'רמי לוי תקשורת': TEST_EMAIL,
+  'הוט מובייל':      TEST_EMAIL,
+  'הוט':             TEST_EMAIL,
+  'יס':              TEST_EMAIL,
+  'אקספון':          TEST_EMAIL,
+  'אנלימיטד':        TEST_EMAIL,
+  'סלקום TV':        TEST_EMAIL,
+  'פרטנר TV':        TEST_EMAIL,
+  'סטינג TV':        TEST_EMAIL,
+  'Free TV':         TEST_EMAIL,
+  'גולן טלקום':      TEST_EMAIL,
+  '019':             TEST_EMAIL,
 };
